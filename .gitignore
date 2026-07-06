@@ -1,0 +1,8 @@
+# Clés API - ne jamais pousser sur Git
+server-config.js
+
+# Dépendances Node (si tu en ajoutes un jour)
+node_modules/
+
+# Fichiers système
+.DS_Store

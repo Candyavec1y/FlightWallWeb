@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlightWall Web</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="topbar">
+    <h1>✈️ FlightWall <span class="accent">WEB</span></h1>
+    <div id="status" class="status">Initialisation…</div>
+  </header>
+
+  <main id="panel" class="panel">
+    <!-- Les "tuiles" de vol sont générées dynamiquement par app.js -->
+    <div class="empty-msg" id="emptyMsg">Recherche de vols…</div>
+  </main>
+
+  <footer class="footer">
+    <span id="lastUpdate">—</span> ·
+    Centre: <span id="centerInfo">—</span> ·
+    Rayon: <span id="radiusInfo">—</span> km
+  </footer>
+
+  <!-- 1) Mets tes clés API dans config.js -->
+  <script src="config.js"></script>
+  <!-- 2) Logique de récupération / affichage -->
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+:root {
+  --bg: #05070a;
+  --panel-bg: #0a0d12;
+  --led: #ff9d00;
+  --led-dim: #4a2f00;
+  --led-green: #35ff6b;
+  --led-red: #ff3b3b;
+  --grid-line: #14181f;
+  --font: 'Courier New', 'Consolas', monospace;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--led);
+  font-family: var(--font);
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 2px solid var(--grid-line);
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: 1.4rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.accent { color: var(--led-green); }
+
+.status {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.status.error { color: var(--led-red); }
+.status.ok { color: var(--led-green); }
+
+.panel {
+  flex: 1;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+  align-content: start;
+}
+
+.empty-msg {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: #555;
+  padding: 40px;
+  font-size: 0.9rem;
+}
+
+.flight-tile {
+  background: var(--panel-bg);
+  border: 1px solid var(--grid-line);
+  border-radius: 4px;
+  padding: 14px 16px;
+  box-shadow: 0 0 12px rgba(255, 157, 0, 0.05) inset;
+}
+
+.flight-tile .callsign {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: var(--led);
+  text-shadow: 0 0 6px rgba(255, 157, 0, 0.6);
+  letter-spacing: 1px;
+}
+
+.flight-tile .route {
+  margin-top: 4px;
+  font-size: 0.95rem;
+  color: var(--led-green);
+  text-shadow: 0 0 6px rgba(53, 255, 107, 0.5);
+}
+
+.flight-tile .meta {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 10px;
+  font-size: 0.78rem;
+  color: #cfa15a;
+}
+
+.flight-tile .meta span.label {
+  color: #6b5326;
+}
+
+.flight-tile .airline {
+  margin-top: 8px;
+  font-size: 0.75rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.footer {
+  padding: 10px 20px;
+  border-top: 2px solid var(--grid-line);
+  font-size: 0.75rem;
+  color: #555;
+  display: flex;
+  gap: 16px;
+}
