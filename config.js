@@ -11,5 +11,5 @@ const CONFIG = {
   // autres infos
   REFRESH_INTERVAL_MS: 15000,
   MAX_FLIGHTS_DISPLAYED: 12,
-  ENABLE_AEROAPI: true
+  ENABLE_AEROAPI: false
 };
