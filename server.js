@@ -52,6 +52,117 @@ async function getOpenSkyToken() {
   return openSkyToken;
 }
 
+// ---- AISStream.io : connexion WebSocket persistante + cache des bateaux ----
+// Contrairement à OpenSky (REST, on interroge à la demande), AISStream
+// pousse les données en continu. Le serveur garde donc une connexion
+// ouverte et stocke les dernières infos connues de chaque bateau (par MMSI).
+// Le navigateur, lui, continue de simplement faire des GET périodiques sur
+// /api/ships, comme pour /api/states.
+const ships = new Map(); // mmsi -> { mmsi, name, lat, lon, sog, cog, heading, navStatus, destination, shipType, lastUpdate }
+let aisSocket = null;
+let aisBBoxKey = null;
+
+function connectAisStream(bbox) {
+  const key = `${bbox.lamin.toFixed(2)},${bbox.lomin.toFixed(2)},${bbox.lamax.toFixed(2)},${bbox.lomax.toFixed(2)}`;
+  if (aisBBoxKey === key && aisSocket && aisSocket.readyState <= 1) return; // déjà connecté sur cette zone
+
+  if (aisSocket) {
+    try { aisSocket.close(); } catch (_) {}
+  }
+  aisBBoxKey = key;
+
+  if (!keys.AISSTREAM_API_KEY || keys.AISSTREAM_API_KEY.trim() === '') {
+    aisSocket = null;
+    return; // AISStream désactivée (pas de clé) : on ne se connecte pas
+  }
+
+  const socket = new WebSocket('wss://stream.aisstream.io/v0/stream');
+  aisSocket = socket;
+
+  socket.addEventListener('open', () => {
+    socket.send(JSON.stringify({
+      APIKey: keys.AISSTREAM_API_KEY,
+      BoundingBoxes: [[[bbox.lamin, bbox.lomin], [bbox.lamax, bbox.lomax]]]
+    }));
+    console.log('AISStream connecté pour la zone', key);
+  });
+
+  socket.addEventListener('message', (event) => {
+    try {
+      const data = JSON.parse(event.data);
+      handleAisMessage(data);
+    } catch (err) {
+      console.warn('Message AISStream illisible:', err.message);
+    }
+  });
+
+  socket.addEventListener('error', (event) => {
+    console.warn('Erreur AISStream:', event.message || event);
+  });
+
+  socket.addEventListener('close', () => {
+    // Reconnexion automatique après une courte pause, sauf si on a changé de zone entre-temps
+    if (aisSocket === socket) {
+      aisSocket = null;
+      setTimeout(() => connectAisStream(bbox), 5000);
+    }
+  });
+}
+
+function handleAisMessage(data) {
+  const meta = data.MetaData;
+  if (!meta || meta.MMSI == null) return;
+
+  const mmsi = meta.MMSI;
+  const existing = ships.get(mmsi) || { mmsi };
+
+  existing.name = (meta.ShipName || existing.name || '').trim() || null;
+  existing.lat = meta.latitude ?? existing.lat;
+  existing.lon = meta.longitude ?? existing.lon;
+  existing.lastUpdate = Date.now();
+
+  if (data.MessageType === 'PositionReport' && data.Message?.PositionReport) {
+    const pr = data.Message.PositionReport;
+    existing.sog = pr.Sog;
+    existing.cog = pr.Cog;
+    existing.heading = pr.TrueHeading;
+    existing.navStatus = pr.NavigationalStatus;
+  } else if (data.MessageType === 'ShipStaticData' && data.Message?.ShipStaticData) {
+    const sd = data.Message.ShipStaticData;
+    if (sd.Destination) existing.destination = sd.Destination.trim();
+    if (sd.Type != null) existing.shipType = sd.Type;
+  }
+
+  ships.set(mmsi, existing);
+}
+
+async function handleShips(query, res) {
+  try {
+    const bbox = {
+      lamin: parseFloat(query.lamin), lomin: parseFloat(query.lomin),
+      lamax: parseFloat(query.lamax), lomax: parseFloat(query.lomax)
+    };
+    connectAisStream(bbox);
+
+    // On retire les bateaux dont on n'a plus de nouvelles depuis trop longtemps
+    const staleAfter = parseInt(query.staleAfterMs, 10) || 10 * 60 * 1000;
+    const now = Date.now();
+    for (const [mmsi, ship] of ships) {
+      if (now - ship.lastUpdate > staleAfter) ships.delete(mmsi);
+    }
+
+    const list = Array.from(ships.values()).filter(s => s.lat != null && s.lon != null);
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      ships: list,
+      disabled: !keys.AISSTREAM_API_KEY || keys.AISSTREAM_API_KEY.trim() === ''
+    }));
+  } catch (err) {
+    res.writeHead(502, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: err.message }));
+  }
+}
+
 // ---- Handlers API ----
 async function handleStates(query, res) {
   try {
@@ -73,6 +184,14 @@ async function handleStates(query, res) {
 }
 
 async function handleAeroApi(callsign, res) {
+  // AeroAPI est optionnelle : si aucune clé n'est configurée, on répond
+  // immédiatement sans appeler FlightAware (évite un appel inutile qui échouerait).
+  if (!keys.AEROAPI_KEY || keys.AEROAPI_KEY.trim() === '') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ flights: [], disabled: true }));
+    return;
+  }
+
   try {
     const r = await fetch(`https://aeroapi.flightaware.com/aeroapi/flights/${encodeURIComponent(callsign)}`, {
       headers: { 'x-apikey': keys.AEROAPI_KEY }
@@ -116,6 +235,10 @@ const server = http.createServer(async (req, res) => {
   if (url.pathname.startsWith('/api/aeroapi/')) {
     const callsign = url.pathname.replace('/api/aeroapi/', '');
     return handleAeroApi(callsign, res);
+  }
+
+  if (url.pathname === '/api/ships') {
+    return handleShips(Object.fromEntries(url.searchParams), res);
   }
 
   serveStatic(url.pathname, res);

@@ -11,5 +11,12 @@ const CONFIG = {
   // autres infos
   REFRESH_INTERVAL_MS: 15000,
   MAX_FLIGHTS_DISPLAYED: 12,
-  ENABLE_AEROAPI: false
+  ENABLE_AEROAPI: false,
+
+  // bateaux
+  // Réutilise CENTER_LAT / CENTER_LON ci-dessus.
+  SHIP_RADIUS_KM: 15,
+  MAX_SHIPS_DISPLAYED: 12,
+  SHIP_STALE_AFTER_MS: 10 * 60 * 1000 // on retire un bateau si pas de nouvelle position depuis 10 min
+
 };

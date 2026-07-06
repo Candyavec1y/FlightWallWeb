@@ -35,6 +35,29 @@ body {
   color: var(--accent);
 }
 
+.site-nav {
+  display: flex;
+  gap: 16px;
+}
+
+.site-nav-link {
+  color: var(--accent-dim);
+  text-decoration: none;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+  padding-bottom: 2px;
+  border-bottom: 2px solid transparent;
+}
+
+.site-nav-link:hover {
+  color: var(--accent);
+}
+
+.site-nav-link.active {
+  color: var(--text-bright);
+  border-bottom-color: var(--accent);
+}
+
 .status {
   font-size: 0.8rem;
   color: var(--accent-dim);
