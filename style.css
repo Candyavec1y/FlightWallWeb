@@ -1,11 +1,11 @@
 :root {
-  --bg: #05070a;
-  --panel-bg: #0a0d12;
-  --led: #ff9d00;
-  --led-dim: #4a2f00;
-  --led-green: #35ff6b;
-  --led-red: #ff3b3b;
-  --grid-line: #14181f;
+  --bg-page: #050d1a;
+  --board-bg: #0a1f3d;
+  --board-border: #14345c;
+  --accent: #5ea8e8;
+  --accent-dim: #3d6d9e;
+  --line: #1c3f6b;
+  --text-bright: #eaf4ff;
   --font: 'Courier New', 'Consolas', monospace;
 }
 
@@ -14,8 +14,8 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background: var(--bg);
-  color: var(--led);
+  background: var(--bg-page);
+  color: var(--accent);
   font-family: var(--font);
   display: flex;
   flex-direction: column;
@@ -26,92 +26,146 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 14px 20px;
-  border-bottom: 2px solid var(--grid-line);
+  border-bottom: 1px solid var(--line);
 }
 
-.topbar h1 {
-  margin: 0;
-  font-size: 1.4rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
+.brand {
+  font-size: 1.1rem;
+  letter-spacing: 3px;
+  color: var(--accent);
 }
-
-.accent { color: var(--led-green); }
 
 .status {
   font-size: 0.8rem;
-  color: #888;
+  color: var(--accent-dim);
 }
 
-.status.error { color: var(--led-red); }
-.status.ok { color: var(--led-green); }
+.status.error { color: #e86a5e; }
+.status.ok { color: #6fd19a; }
 
-.panel {
+.board-wrap {
   flex: 1;
-  padding: 20px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 14px;
-  align-content: start;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
 }
+
+.board {
+  width: 100%;
+  max-width: 560px;
+  background: var(--board-bg);
+  border-radius: 10px;
+  padding: 28px 32px;
+  box-shadow: inset 0 0 0 1px var(--board-border);
+  position: relative;
+}
+
+.board-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.nav-btn {
+  background: #102a4d;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  width: 40px;
+  height: 68px;
+  color: var(--accent);
+  font-size: 1.6rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.nav-btn:hover { background: #16345c; }
+.nav-btn:disabled { opacity: 0.3; cursor: default; }
+.nav-btn.hidden { visibility: hidden; }
+
+.board-main {
+  flex: 1;
+  text-align: center;
+  min-width: 0;
+}
+
+.callsign {
+  color: var(--text-bright);
+  font-size: 2.3rem;
+  font-weight: bold;
+  letter-spacing: 3px;
+  text-shadow: 0 0 10px rgba(94, 168, 232, 0.5);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.route {
+  color: var(--accent);
+  font-size: 1.25rem;
+  margin-top: 6px;
+  letter-spacing: 2px;
+}
+
+.meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 10px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.meta-label {
+  color: var(--accent-dim);
+  font-size: 0.68rem;
+  letter-spacing: 1px;
+}
+
+.meta-value {
+  color: var(--text-bright);
+  font-size: 1rem;
+  margin-top: 2px;
+}
+
+.airline {
+  margin-top: 16px;
+  color: var(--accent-dim);
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  text-align: center;
+  min-height: 1em;
+}
+
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 20px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--line);
+}
+
+.dot.active { background: var(--accent); }
 
 .empty-msg {
-  grid-column: 1 / -1;
+  display: none;
   text-align: center;
-  color: #555;
-  padding: 40px;
+  color: var(--accent-dim);
+  padding: 20px 0 0;
   font-size: 0.9rem;
-}
-
-.flight-tile {
-  background: var(--panel-bg);
-  border: 1px solid var(--grid-line);
-  border-radius: 4px;
-  padding: 14px 16px;
-  box-shadow: 0 0 12px rgba(255, 157, 0, 0.05) inset;
-}
-
-.flight-tile .callsign {
-  font-size: 1.3rem;
-  font-weight: bold;
-  color: var(--led);
-  text-shadow: 0 0 6px rgba(255, 157, 0, 0.6);
-  letter-spacing: 1px;
-}
-
-.flight-tile .route {
-  margin-top: 4px;
-  font-size: 0.95rem;
-  color: var(--led-green);
-  text-shadow: 0 0 6px rgba(53, 255, 107, 0.5);
-}
-
-.flight-tile .meta {
-  margin-top: 10px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4px 10px;
-  font-size: 0.78rem;
-  color: #cfa15a;
-}
-
-.flight-tile .meta span.label {
-  color: #6b5326;
-}
-
-.flight-tile .airline {
-  margin-top: 8px;
-  font-size: 0.75rem;
-  color: #888;
-  text-transform: uppercase;
-  letter-spacing: 1px;
 }
 
 .footer {
   padding: 10px 20px;
-  border-top: 2px solid var(--grid-line);
+  border-top: 1px solid var(--line);
   font-size: 0.75rem;
-  color: #555;
+  color: var(--accent-dim);
   display: flex;
   gap: 16px;
 }

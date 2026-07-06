@@ -9,13 +9,49 @@
 <body>
 
   <header class="topbar">
-    <h1>✈️ FlightWall <span class="accent">WEB</span></h1>
+    <span class="brand">FLIGHTWALL</span>
     <div id="status" class="status">Initialisation…</div>
   </header>
 
-  <main id="panel" class="panel">
-    <!-- Les "tuiles" de vol sont générées dynamiquement par app.js -->
-    <div class="empty-msg" id="emptyMsg">Recherche de vols…</div>
+  <main class="board-wrap">
+    <div class="board" id="board">
+
+      <div class="board-row">
+        <button id="prevBtn" class="nav-btn" aria-label="Vol précédent">‹</button>
+
+        <div class="board-main">
+          <div class="callsign" id="callsign">—</div>
+          <div class="route" id="route">—</div>
+        </div>
+
+        <button id="nextBtn" class="nav-btn" aria-label="Vol suivant">›</button>
+      </div>
+
+      <div class="meta-grid">
+        <div class="meta-cell">
+          <div class="meta-label">ALTITUDE</div>
+          <div class="meta-value" id="alt">—</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">VITESSE</div>
+          <div class="meta-value" id="spd">—</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">CAP</div>
+          <div class="meta-value" id="trk">—</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">VZ</div>
+          <div class="meta-value" id="vz">—</div>
+        </div>
+      </div>
+
+      <div class="airline" id="airline"></div>
+
+      <div class="dots" id="dots"></div>
+
+      <div class="empty-msg" id="emptyMsg">Recherche de vols…</div>
+    </div>
   </main>
 
   <footer class="footer">
@@ -24,7 +60,7 @@
     Rayon: <span id="radiusInfo">—</span> km
   </footer>
 
-  <!-- 1) Mets tes clés API dans config.js -->
+  <!-- 1) Réglages non secrets (position, rayon...) -->
   <script src="config.js"></script>
   <!-- 2) Logique de récupération / affichage -->
   <script src="app.js"></script>
