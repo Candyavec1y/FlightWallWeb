@@ -87,10 +87,19 @@ function connectAisStream(bbox) {
     console.log('AISStream connecté pour la zone', key);
   });
 
-  socket.addEventListener('message', (event) => {
+  socket.addEventListener('message', async (event) => {
     try {
-      const data = JSON.parse(event.data);
-      handleAisMessage(data);
+      // Selon l'implémentation, event.data peut être une string, un Buffer,
+      // ou un Blob (WHATWG) — on normalise en texte avant de parser le JSON.
+      let text;
+      if (typeof event.data === 'string') {
+        text = event.data;
+      } else if (typeof event.data.text === 'function') {
+        text = await event.data.text(); // Blob
+      } else {
+        text = event.data.toString(); // Buffer / ArrayBuffer
+      }
+      handleAisMessage(JSON.parse(text));
     } catch (err) {
       console.warn('Message AISStream illisible:', err.message);
     }
