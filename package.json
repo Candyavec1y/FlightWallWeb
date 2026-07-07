@@ -1,0 +1,27 @@
+{
+  "name": "flightwallwebapp",
+  "version": "1.0.0",
+  "description": "Adaptation web (front-end + petit serveur local) du projet [TheFlightWall_OSS](https://github.com/AxisNimble/TheFlightWall_OSS) : affiche dans une page web les avions détectés autour d'une position donnée, avec vitesse, altitude, cap, taux de montée/descente, et (optionnel) route et compagnie.",
+  "main": "server-config.example.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Candyavec1y/FlightWallWeb.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Candyavec1y/FlightWallWeb/issues"
+  },
+  "homepage": "https://github.com/Candyavec1y/FlightWallWeb#readme",
+  "dependencies": {
+    "@capacitor/cli": "^8.4.1",
+    "@capacitor/core": "^8.4.1",
+    "@capacitor/ios": "^8.4.1"
+  }
+}
